@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html ng-app="">
+<head>
+<link rel="stylesheet" href = "http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+</head>
+
+<body ng-controller="itemController">
+<div class="container">
+
+<h3>The Concierge</h3>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+    <th>No.</th>
+      <th>Item</th>
+      <th>Description</th>
+      <th>Deadline</th>
+      <th colspan="2" style="text-align:center">Action</th>
+      <th>Completed?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="item in items">
+    <td>{{ item.id }}</td>
+      <td>{{ item.itemName }}</td>
+      <td>{{ item.desc }}</td>
+      <td>{{ item.date }}</td>
+      <td style="text-align:center">
+        <button class="btn" ng-click="editItem(item.id)">
+          <span class="glyphicon glyphicon-pencil"></span>  Edit
+        </button>
+      </td>
+      <td style="text-align:center">
+        <button class="btn" ng-click="deleteItem(items.id)">
+          <span class="glyphicon glyphicon-pencil"></span>  Delete
+        </button>
+      </td>
+      <td style="text-align:center">
+        <input type="checkbox">
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<button class="btn btn-success" ng-click="editItem('new')">
+<span class="glyphicon glyphicon-shopping-cart"></span>  Add New Item
+</button>
+<hr>
+
+
+<h3 ng-show="editItem">Add New Item:</h3>
+<h3 ng-hide="editItem">Edit items:</h3>
+
+<form class="form-horizontal">
+  <div class="form-group">
+    <label class="col-sm-2 control-label">Item:</label>
+    <div class="col-sm-10">
+    <input type="text" ng-model="itemName" ng-disabled="!edit" placeholder="Item">
+    </div>
+  </div> 
+  <div class="form-group">
+    <label class="col-sm-2 control-label">Description:</label>
+    <div class="col-sm-10">
+    <input type="text" ng-model="desc" ng-disabled="!edit" placeholder="Description">
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-2 control-label">Deadline:</label>
+    <div class="col-sm-10">
+    <input type="text" ng-model="date" ng-disabled="!edit" placeholder="mm/dd/yyyy">
+    </div>
+  </div>
+</form>
+
+<hr>
+<button class="btn btn-success" ng-disabled="error || incomplete" ng-click="save()">
+<span class="glyphicon glyphicon-save"></span>  Save Changes
+</button>
+
+</div>
+
+<script>
+  function itemController($scope) {
+    $scope.itemName = '';
+    $scope.desc = '';
+    $scope.date = '';
+    
+    //We can replace this with a Firebase url later on. 
+    $scope.items = [
+        {id:1, itemName:'Weekly Groceries'  , desc:"Chicken, Pork, Beansprouts" , date: "01/01/2016"},
+        {id:2, itemName:'Book Chalet'   , desc:"East Coast Park Chalet" , date: "01/02/2016" },
+        {id:3, itemName:'Homework'  , desc:"Cloud homework" , date: "01/03/2016" },
+        {id:4, itemName:'Pictures of city skyline'  , desc:"From Marina Bay Sands Infinity Pool" , date: "01/04/2016" },
+        {id:5, itemName:'Mowing the lawn' , desc:"Front and backyard" , date: "01/05/2016" }
+    ];
+    
+    $scope.edit = true;
+    $scope.error = false;
+    $scope.incomplete = false;  
+    
+    
+    $scope.editItem = function(id) {
+        $scope.currentId = id;
+        if (id == 'new') {
+            $scope.edit = true;
+            $scope.incomplete = true;
+            $scope.itemName = '';
+            $scope.desc = '';
+            $scope.date = '';
+            console.log("new item.");
+        } else {
+            $scope.edit = true;
+            $scope.itemName = $scope.items[id-1].itemName;
+            $scope.desc = $scope.items[id-1].desc; 
+            $scope.date = $scope.items[id-1].date;
+            console.log("existing item.");
+        }
+    };
+    
+    $scope.$watch('date',function() {$scope.test();});
+    $scope.$watch('itemName', function() {$scope.test();});
+    $scope.$watch('desc', function() {$scope.test();});
+    $scope.test = function() {
+        if ($scope.item === "" || $scope.desc === "" || $scope.date ==="") {
+            $scope.error = true;
+        } else {
+            $scope.error = false;
+        }
+        $scope.incomplete = false;
+    };
+    $scope.save = function(){
+      //Add new if no index is passed in.
+      if($scope.currentId=='new'){
+        //Using the array length as the next index while prototyping. 
+        $scope.items.push({id:$scope.items.length+1, itemName:$scope.itemName  , desc:$scope.desc , date:$scope.date});
+      }
+      else{
+        $scope.items[$scope.currentId-1].itemName = $scope.itemName;
+        $scope.items[$scope.currentId-1].desc = $scope.desc;
+        $scope.items[$scope.currentId-1].date = $scope.date;
+      }
+    };
+    
+    $scope.deleteItem = function(index){
+      $scope.items.splice(index-1, 1);
+    }
+    
+    }
+  
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
